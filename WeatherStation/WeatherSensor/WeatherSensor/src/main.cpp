@@ -10,13 +10,14 @@
 #include "RF24.h"         // ещё библиотека радиомодуля
 #include <OneWire.h>
 
-OneWire  ds(3);  // on pin 10 (a 4.7K resistor is necessary)
+OneWire  ds(3);  // on pin 3 (a 4.7K resistor is necessary)
 RF24 radio(9, 10); // "создать" модуль на пинах 9 и 10 Для Уно
 //RF24 radio(9,53); // для Меги
 
 byte address[][6] = {"1Node", "2Node", "3Node", "4Node", "5Node", "6Node"}; //возможные номера труб
 
-byte counter;
+byte var;
+byte celsius;
 
 void setup() {
   Serial.begin(9600); //открываем порт для связи с ПК
@@ -40,7 +41,6 @@ void setup() {
 }
 
 void loop(void) {
- ////////////////////////////////////////sensor//////////////////////////
  
   byte i;
   byte present = 0;
@@ -85,10 +85,8 @@ for ( i = 0; i < 9; i++) {
     else if (cfg == 0x40) raw = raw & ~1; 
   }
   celsius = (float)raw / 16.0;
-  Serial.print(celsius);
-  //Serial.print("Sent: "); Serial.println(celsius);
-  radio.write(&celsius, float(celsius));
-////////////////////////////////////////sensor end //////////////////////////
- 
-  
+  int var = celsius;
+  Serial.print("Sent: "); Serial.println(var);
+  radio.write(&var, sizeof(var));
+  delay(600000);
 }
