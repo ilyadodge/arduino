@@ -11,6 +11,7 @@
 #include <Wire.h> 
 #include <LiquidCrystal_I2C.h>
 
+/*
 byte bukva_B[8]   = {B11110,B10000,B10000,B11110,B10001,B10001,B11110,B00000,}; // Буква "Б"
 byte bukva_G[8]   = {B11111,B10001,B10000,B10000,B10000,B10000,B10000,B00000,}; // Буква "Г"
 byte bukva_D[8]   = {B01111,B00101,B00101,B01001,B10001,B11111,B10001,B00000,}; // Буква "Д"
@@ -30,6 +31,7 @@ byte bukva_Mz[8]  = {B10000,B10000,B10000,B11110,B10001,B10001,B11110,B00000,}; 
 byte bukva_IYI[8] = {B10001,B10001,B10001,B11001,B10101,B10101,B11001,B00000,}; // Буква "Ы"
 byte bukva_Yu[8]  = {B10010,B10101,B10101,B11101,B10101,B10101,B10010,B00000,}; // Буква "Ю"
 byte bukva_Ya[8]  = {B01111,B10001,B10001,B01111,B00101,B01001,B10001,B00000,}; // Буква "Я"
+*/
 
 RF24 radio(7,8); // "создать" модуль на пинах 9 и 10 Для Уно
 //RF24 radio(9,53); // для Меги
@@ -60,20 +62,23 @@ void setup(){
   lcd.backlight();// Включаем подсветку дисплея
  lcd.print("Air temperature");
   lcd.setCursor(0, 1);
- lcd.print("Street - ");
+ lcd.print("Street");
 }
 
 void loop() {
-    byte pipeNo, gotByte; 
-                            
+    byte pipeNo; 
+     float data[2];                       
     while( radio.available(&pipeNo)){    // слушаем эфир со всех труб
-      radio.read( &gotByte, sizeof(gotByte) );         // чиатем входящий сигнал
-
-     // Serial.print("Recieved: "); Serial.println(gotByte);
+      radio.read(&data, sizeof(data));         // чиатем входящий сигнал
+     //Serial.println((int)data[0]);
+     
       // Устанавливаем курсор на вторую строку и нулевой символ.
       lcd.setCursor(9, 1);
   // Выводим на экран количество секунд с момента запуска ардуины
-      lcd.print(gotByte);
+      
+    Serial.println(data[0]);
+      lcd.print(data[0]);
+      delay(500);
    }
 }
 

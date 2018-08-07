@@ -17,9 +17,8 @@ RF24 radio(9, 10); // "создать" модуль на пинах 9 и 10 Дл
 
 byte address[][6] = {"1Node", "2Node", "3Node", "4Node", "5Node", "6Node"}; //возможные номера труб
 
-byte var;
-byte celsius;
-char data[2];
+
+
 
 void setup() {
   Serial.begin(9600); //открываем порт для связи с ПК
@@ -49,7 +48,6 @@ void loop(void) {
   byte type_s;
   byte data[12];
   byte addr[8];
-  float celsius;
   
   
   if ( !ds.search(addr)) {  
@@ -65,7 +63,7 @@ void loop(void) {
   ds.reset();
   ds.select(addr);
   ds.write(0x44);        
-  delay(1000);       
+  //delay(1000);       
   present = ds.reset();
   ds.select(addr);    
   ds.write(0xBE); 
@@ -87,11 +85,9 @@ for ( i = 0; i < 9; i++) {
     else if (cfg == 0x20) raw = raw & ~3;
     else if (cfg == 0x40) raw = raw & ~1; 
   }
-  celsius = (float)raw / 16.0;
-  //int var = celsius;
-
-  data[0] = celsius;
-  Serial.print("Sent: "); Serial.println(data[0]);
-  radio.write(&data, sizeof(data));
+  float data1[2];
+  data1[0] = float(raw) / 16.0;
+  Serial.print("Sent1: "); Serial.println(float(raw) / 16.0);
+  radio.write(&data1, sizeof(data1));
   delay(500);
 }
