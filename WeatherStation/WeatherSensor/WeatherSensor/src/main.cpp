@@ -14,10 +14,12 @@ OneWire  ds(3);  // on pin 3 (a 4.7K resistor is necessary)
 RF24 radio(9, 10); // "создать" модуль на пинах 9 и 10 Для Уно
 //RF24 radio(9,53); // для Меги
 
+
 byte address[][6] = {"1Node", "2Node", "3Node", "4Node", "5Node", "6Node"}; //возможные номера труб
 
 byte var;
 byte celsius;
+char data[2];
 
 void setup() {
   Serial.begin(9600); //открываем порт для связи с ПК
@@ -48,6 +50,7 @@ void loop(void) {
   byte data[12];
   byte addr[8];
   float celsius;
+  
   
   if ( !ds.search(addr)) {  
     ds.reset_search();
@@ -85,8 +88,10 @@ for ( i = 0; i < 9; i++) {
     else if (cfg == 0x40) raw = raw & ~1; 
   }
   celsius = (float)raw / 16.0;
-  int var = celsius;
-  Serial.print("Sent: "); Serial.println(var);
-  radio.write(&var, sizeof(var));
-  delay(5000);
+  //int var = celsius;
+
+  data[0] = celsius;
+  Serial.print("Sent: "); Serial.println(data[0]);
+  radio.write(&data, sizeof(data));
+  delay(500);
 }
