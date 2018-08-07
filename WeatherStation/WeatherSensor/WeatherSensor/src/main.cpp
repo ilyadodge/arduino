@@ -88,5 +88,5 @@ for ( i = 0; i < 9; i++) {
   int var = celsius;
   Serial.print("Sent: "); Serial.println(var);
   radio.write(&var, sizeof(var));
-  delay(600000);
+  delay(5000);
 }
