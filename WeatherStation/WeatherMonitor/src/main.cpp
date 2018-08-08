@@ -60,21 +60,22 @@ void setup(){
 
   lcd.init();                     
   lcd.backlight();// Включаем подсветку дисплея
- lcd.print("Air temperature");
+  lcd.print("Air temperature");
   lcd.setCursor(0, 1);
- lcd.print("Street");
+  lcd.print("Street");
 }
 
 void loop() {
     byte pipeNo; 
-     float data[2];                       
+    float data[2]; 
+
     while( radio.available(&pipeNo)){    // слушаем эфир со всех труб
       radio.read(&data, sizeof(data));         // чиатем входящий сигнал
-     //Serial.println((int)data[0]);
      
-      // Устанавливаем курсор на вторую строку и нулевой символ.
+     
+ // Устанавливаем курсор на вторую строку и нулевой символ.
       lcd.setCursor(9, 1);
-  // Выводим на экран количество секунд с момента запуска ардуины
+ // Выводим на экран количество секунд с момента запуска ардуины
       
     Serial.println(data[0]);
       lcd.print(data[0]);
