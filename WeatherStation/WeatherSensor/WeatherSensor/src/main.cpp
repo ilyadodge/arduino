@@ -14,6 +14,7 @@ OneWire  ds(3);  // on pin 3 (a 4.7K resistor is necessary)
 RF24 radio(9, 10); // "создать" модуль на пинах 9 и 10 Для Уно
 //RF24 radio(9,53); // для Меги
 byte address[][6] = {"1Node", "2Node", "3Node", "4Node", "5Node", "6Node"}; //возможные номера труб
+unsigned long timing; // Переменная для хранения точки отсчета
 
 void setup() {
   Serial.begin(9600); //открываем порт для связи с ПК
@@ -28,11 +29,14 @@ void setup() {
   radio.setDataRate (RF24_250KBPS); //скорость обмена. На выбор RF24_2MBPS, RF24_1MBPS, RF24_250KBPS
   //должна быть одинакова на приёмнике и передатчике!
   //при самой низкой скорости имеем самую высокую чувствительность и дальность!!
-  radio.powerUp(); //начать работу
-  radio.stopListening();  //не слушаем радиоэфир, мы передатчик
+  
 }
-
+float testdata0 = 0;
+int k = 0;
 void loop(void) {
+ 
+if (millis() - timing > 10000){ // Вместо 10000 подставить нужное  значение паузы (пауза между циклами проверки данных)
+  timing = millis(); 
  
   byte i;
   byte present = 0;
@@ -75,9 +79,36 @@ for ( i = 0; i < 9; i++) {
     else if (cfg == 0x20) raw = raw & ~3;
     else if (cfg == 0x40) raw = raw & ~1; 
   }
-  float data1[2];
+  float data1[2]; 
   data1[0] = float(raw) / 16.0;
- // Serial.print("Sent1: "); Serial.println(float(raw) / 16.0);
-  radio.write(&data1, sizeof(data1));
-  delay(500);
+  
+
+    //  Serial.print("testdata0 "); Serial.println(testdata0); //проверка для отладки чему равны переменные используемые для работы условий отправки
+    //  Serial.print("data1[0] "); Serial.println(data1[0]);   //проверка для отладки
+
+  if (testdata0 != data1[0]) {
+    testdata0 = data1[0];
+    //Serial.print("testdata1 "); Serial.println(testdata0); // проверка постоянной отправки данных при условии что данные при каждом цикле изменяються
+    radio.powerUp(); //начать работу
+    radio.stopListening();  //не слушаем радиоэфир, мы передатчик
+    radio.write(&data1, sizeof(data1)); // передаем показания наприемник
+    radio.powerDown();
+    k =0 ; 
+   } else {
+      //Serial.print("testdata2 "); Serial.println(testdata0); // проверка работы условия при котором данные не отпрравляються по причине того что они равны предыдущим
+      k++;
+      //Serial.print("k = "); Serial.println(k); 
+      delay (5000); // задержка дальнейшего выполняни при срабатывании условия (по хорошему вместо задержки должен стоять блок отправки в спячку)
+        if (k >= 10) {
+          testdata0 = data1[0];
+          //Serial.print("testdata3 "); Serial.println(testdata0); //проверка работы условия по отправки через N циклов не изменяющихся данных
+          radio.powerUp(); //начать работу
+          radio.stopListening();  //не слушаем радиоэфир, мы передатчик
+          radio.write(&data1, sizeof(data1)); // передаем показания наприемник
+          radio.powerDown(); 
+          k = 0;
+          delay(5000); // задержка дальнейшего выполняни при срабатывании условия (по хорошему вместо задержки должен стоять блок отправки в спячку)
+        }
+   }
+ }
 }
